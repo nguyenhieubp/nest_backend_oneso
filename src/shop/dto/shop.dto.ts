@@ -1,3 +1,4 @@
+import { BusinessArenas } from '../business_arenas.enum';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 import { BaseDto } from 'src/config/baseDto';
@@ -39,7 +40,7 @@ export class ShopDto extends BaseDto {
 
   @IsNotEmpty()
   @Expose()
-  business_arenas: string;
+  business_arenas: keyof BusinessArenas;
 
   @Expose()
   referral_code: string;

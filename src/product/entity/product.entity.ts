@@ -34,10 +34,10 @@ export class ProductEntity extends BaseEntity {
   @Column()
   discount_price_online: number;
 
-  @Column()
+  @Column({ nullable: true })
   category: string;
 
-  @Column()
+  @Column({ default: false })
   isShow: boolean;
 
   @Column('uuid')

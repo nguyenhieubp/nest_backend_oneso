@@ -1,7 +1,8 @@
 import { Expose } from 'class-transformer';
-import { IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 import { BaseDto } from 'src/config/baseDto';
 import { ShopEntity } from 'src/shop/entity/shop.entity';
+import { CateGory } from '../category.enum';
 
 export class ProductDto extends BaseDto {
   @Expose()
@@ -32,7 +33,8 @@ export class ProductDto extends BaseDto {
   discount_price_online: number;
 
   @Expose()
-  category: string;
+  @IsNotEmpty()
+  category: keyof CateGory;
 
   @Expose()
   isShow: boolean;

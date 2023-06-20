@@ -46,9 +46,6 @@ export class ShopEntity extends BaseEntity {
   @Column({ default: '' })
   banner_shop: string;
 
-  @Column('uuid', { array: true, default: [] })
-  productsId: ProductEntity[];
-
   @OneToMany(() => ProductEntity, (product) => product.shop)
   products: ProductEntity;
 }

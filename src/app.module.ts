@@ -7,6 +7,7 @@ import { UploadModule } from './uploadfile/upload.module';
 import { ShopModule } from './shop/shop.module';
 import { OtpModule } from './otp/otp.module';
 import { ProductModule } from './product/product.module';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProductModule } from './product/product.module';
     ShopModule,
     OtpModule,
     ProductModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],

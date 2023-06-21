@@ -6,6 +6,7 @@ import * as process from 'process';
 import { ShopEntity } from 'src/shop/entity/shop.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { OTPEntity } from 'src/otp/otp.entity';
+import { WalletEntity } from 'src/wallet/entity/wallet.entity';
 env.config();
 
 @Module({
@@ -17,7 +18,13 @@ env.config();
       username: 'postgres',
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
-      entities: [UserEntity, ShopEntity, ProductEntity, OTPEntity],
+      entities: [
+        UserEntity,
+        ShopEntity,
+        ProductEntity,
+        OTPEntity,
+        WalletEntity,
+      ],
       synchronize: true,
     }),
   ],

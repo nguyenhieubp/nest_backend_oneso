@@ -119,4 +119,16 @@ export class ShopController {
   deleteShop(@Param('id') id: string) {
     return this.shopService.deleteShop(id);
   }
+
+  @Get('business/:arena')
+  getShopByBusinessArena(
+    @Param('arena') arena: string,
+  ): Promise<Array<ShopEntity>> {
+    return this.shopService.getShopByBusinessArena(arena);
+  }
+
+  @Get('')
+  getAllShop(): Promise<Array<ShopEntity>> {
+    return this.shopService.getAllShop();
+  }
 }

@@ -40,7 +40,7 @@ export class ShopDto extends BaseDto {
 
   @IsNotEmpty()
   @Expose()
-  business_arenas: keyof BusinessArenas;
+  business_arena: keyof BusinessArenas;
 
   @Expose()
   referral_code: string;

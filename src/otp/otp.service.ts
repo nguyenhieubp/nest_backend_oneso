@@ -9,6 +9,25 @@ export class OtpService {
     @InjectRepository(OTPEntity)
     private readonly otpRepository: Repository<OTPEntity>,
   ) {}
+
+  async generateOTP(email: string, expiresInMinutes: number): Promise<string> {
+    const code = Math.random().toString().slice(2, 8); // Tạo mã OTP ngẫu nhiên
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes); // Thời gian hết hạn của OTP
+
+    const otp = new OTPEntity();
+    otp.email = email;
+    otp.code = code;
+    otp.expiresAt = expiresAt;
+
+    await this.otpRepository.save(otp); // Lưu OTP vào cơ sở dữ liệu
+    return code;
+  }
+
+  //*
+  //*
+  //*
+  //*
   async verifyOTP(email: string, code: string): Promise<boolean> {
     const otp = await this.otpRepository.findOneBy({ email, code });
 
@@ -24,19 +43,5 @@ export class OtpService {
     await this.otpRepository.delete(otp.id);
 
     return true;
-  }
-
-  async generateOTP(email: string, expiresInMinutes: number): Promise<string> {
-    const code = Math.random().toString().slice(2, 8); // Tạo mã OTP ngẫu nhiên
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes); // Thời gian hết hạn của OTP
-
-    const otp = new OTPEntity();
-    otp.email = email;
-    otp.code = code;
-    otp.expiresAt = expiresAt;
-
-    await this.otpRepository.save(otp); // Lưu OTP vào cơ sở dữ liệu
-    return code;
   }
 }

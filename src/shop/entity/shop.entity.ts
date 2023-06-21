@@ -35,7 +35,7 @@ export class ShopEntity extends BaseEntity {
   specific_address: string;
 
   @Column()
-  business_arenas: string;
+  business_arena: string;
 
   @Column({ default: '' })
   referral_code: string;

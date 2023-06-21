@@ -105,4 +105,12 @@ export class ShopService {
     await this.shopRepository.delete(id);
     return 'DELETE SUCCESS';
   }
+
+  async getShopByBusinessArena(arena: string): Promise<Array<ShopEntity>> {
+    return this.shopRepository.findBy({ business_arena: arena });
+  }
+
+  async getAllShop(): Promise<Array<ShopEntity>> {
+    return this.shopRepository.find();
+  }
 }

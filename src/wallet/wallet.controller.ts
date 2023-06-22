@@ -2,7 +2,6 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { WalletDto } from './dto/wallet.dto';
 import { WalletEntity } from './entity/wallet.entity';
-import { v4 as uuidv4, parse as parseUUID } from 'uuid';
 
 @Controller('wallet')
 export class WalletController {
@@ -16,7 +15,6 @@ export class WalletController {
 
   @Get('user/:id')
   getWalletByUser(@Param('id') id: string): Promise<WalletEntity> {
-    const idUuid = parseUUID(id);
-    return this.walletService.getWalletByUser(idUuid);
+    return this.walletService.getWalletByUser(id);
   }
 }

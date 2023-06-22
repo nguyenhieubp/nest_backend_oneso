@@ -69,4 +69,13 @@ export class UserController {
   ): Promise<UserEntity | { error: any }> {
     return await this.userService.updateUser(req.user.id, user);
   }
+
+  @Patch('address')
+  @UseGuards(JwtGuard)
+  updateAddress(
+    @Req() req,
+    @Body('address') address: string,
+  ): Promise<UserEntity | { error: any }> {
+    return this.userService.updateAddress(req.user.id, address);
+  }
 }

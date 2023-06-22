@@ -15,5 +15,10 @@ export class WalletService {
     return await this.walletRepository.save(wallet);
   }
 
-  async getWalletByUser(id: string): Promise<WalletEntity> {}
+  async getWalletByUser(id: string): Promise<WalletEntity> {
+    return await this.walletRepository
+      .createQueryBuilder('wallets')
+      .where('wallets.user =:id', { id: id })
+      .getOne();
+  }
 }

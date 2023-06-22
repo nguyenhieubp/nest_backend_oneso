@@ -3,18 +3,16 @@ import { IsNotEmpty, IsUUID } from 'class-validator';
 import { BaseDto } from 'src/config/baseDto';
 import { UserEntity } from 'src/user/user.entity/user.entity';
 
-export class WalletDto extends BaseDto {
+export class AddressUserDto extends BaseDto {
   @Expose()
-  commission: number;
-
-  @Expose()
-  consumer_wallet: number;
-
-  @Expose()
-  oneso_pay: number;
-
-  @Expose()
-  @IsUUID()
   @IsNotEmpty()
-  userId: UserEntity;
+  city: string;
+
+  @Expose()
+  @IsNotEmpty()
+  address_line1: string;
+
+  @Expose()
+  @IsNotEmpty()
+  address_line2: string;
 }

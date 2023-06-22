@@ -89,6 +89,7 @@ export class UserService {
         'roles',
         'phone_number',
         'referral_code',
+        'address',
         'user_code',
         'create_at',
         'update_at',
@@ -102,7 +103,7 @@ export class UserService {
     phoneNumber: string,
   ): Promise<UserEntity> {
     await this.userRepository.update(id, { phone_number: phoneNumber });
-    return this.findUserById(id);
+    return await this.findUserById(id);
   }
 
   async referralCode(
@@ -110,7 +111,7 @@ export class UserService {
     referralCode: string,
   ): Promise<{ referral_code: string }> {
     await this.userRepository.update(id, { referral_code: referralCode });
-    return this.userRepository.findOne({
+    return await this.userRepository.findOne({
       select: ['referral_code'],
       where: { id: id },
     });
@@ -118,7 +119,7 @@ export class UserService {
 
   async updateAvatar(id: string, avatar: string): Promise<{ avatar: string }> {
     await this.userRepository.update(id, { avatar: avatar });
-    return this.userRepository.findOne({
+    return await this.userRepository.findOne({
       select: ['avatar'],
       where: { id: id },
     });
@@ -126,6 +127,11 @@ export class UserService {
 
   async updateUser(id: string, user: any): Promise<UserEntity> {
     await this.userRepository.update(id, user);
-    return this.userRepository.findOneById(id);
+    return await this.userRepository.findOneById(id);
+  }
+
+  async updateAddress(id: string, addressId: any): Promise<UserEntity | any> {
+    await this.userRepository.update(id, { address: addressId });
+    return await this.userRepository.findOneById(id);
   }
 }

@@ -1,7 +1,8 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsUUID } from 'class-validator';
 import { Expose } from 'class-transformer';
 import { BaseDto } from '../../config/baseDto';
 import { Role } from '../role.enum';
+import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
 
 export class UserDto extends BaseDto {
   @Expose()
@@ -32,4 +33,8 @@ export class UserDto extends BaseDto {
 
   @Expose()
   refresh_token: string;
+
+  @Expose()
+  @IsUUID()
+  address: AddressUserEntity;
 }

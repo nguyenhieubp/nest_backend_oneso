@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../config/baseEntity';
-import { ShopEntity } from 'src/shop/entity/shop.entity';
+import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -30,4 +30,11 @@ export class UserEntity extends BaseEntity {
 
   @Column({ default: '' })
   refresh_token: string;
+
+  @Column('uuid')
+  addressId: AddressUserEntity;
+
+  @OneToOne(() => AddressUserEntity)
+  @JoinColumn()
+  address: AddressUserEntity;
 }

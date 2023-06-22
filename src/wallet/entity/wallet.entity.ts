@@ -18,7 +18,7 @@ export class WalletEntity extends BaseEntity {
   commission: number;
 
   @Column({ default: 0 })
-  consumer_fund: number;
+  consumer_wallet: number;
 
   @Column({ default: 0 })
   oneso_pay: number;

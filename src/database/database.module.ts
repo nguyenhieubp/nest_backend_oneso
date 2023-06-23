@@ -11,6 +11,8 @@ import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
 import { FundEntity } from 'src/fund/entity/fund.entity';
 import { OrderEntity } from 'src/order/entity/order.entity';
 import { OrderItemEntity } from 'src/order_item/entity/order_item.entity';
+import { CartEntity } from 'src/cart/entity/cart.entity';
+import { CartItemEntity } from 'src/cart_item/entity/cart_item.entity';
 env.config();
 
 @Module({
@@ -32,6 +34,8 @@ env.config();
         FundEntity,
         OrderItemEntity,
         OrderEntity,
+        CartEntity,
+        CartItemEntity,
       ],
       synchronize: true,
     }),

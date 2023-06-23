@@ -1,6 +1,15 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { BaseEntity } from '../../config/baseEntity';
 import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
+import { OrderEntity } from 'src/order/entity/order.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -37,4 +46,7 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => AddressUserEntity)
   @JoinColumn()
   address: AddressUserEntity;
+
+  @OneToMany(() => OrderEntity, (order) => order.user)
+  orders: OrderEntity[];
 }

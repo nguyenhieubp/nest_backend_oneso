@@ -12,6 +12,8 @@ import { FundModule } from './fund/fund.module';
 import { AddressUserModule } from './address_user/address_user.module';
 import { OrderItemModule } from './order_item/order_item.module';
 import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
+import { CartItemModule } from './cart_item/cart_item.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { OrderModule } from './order/order.module';
     AddressUserModule,
     OrderItemModule,
     OrderModule,
+    CartModule,
+    CartItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],

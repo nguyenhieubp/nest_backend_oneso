@@ -12,11 +12,9 @@ export class OrderDto extends BaseDto {
   user: UserEntity;
 
   @Expose()
+  @IsNotEmpty()
+  price: Number;
+
+  @Expose()
   comment: string;
-
-  @Expose()
-  isBye: boolean;
-
-  @Expose()
-  isShipping: boolean;
 }

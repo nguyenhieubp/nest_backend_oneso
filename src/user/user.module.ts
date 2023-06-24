@@ -10,7 +10,6 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guard/roles.guard';
 import { AuthController } from './auth.controller';
-import { GlobalExceptionFilter } from 'src/config/exceptionFilter';
 import { ShopEntity } from 'src/shop/entity/shop.entity';
 import { config } from 'dotenv';
 config();
@@ -30,7 +29,6 @@ config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    { provide: APP_FILTER, useClass: GlobalExceptionFilter },
   ],
   exports: [UserService],
 })

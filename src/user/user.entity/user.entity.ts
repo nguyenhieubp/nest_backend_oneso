@@ -10,6 +10,7 @@ import {
 import { BaseEntity } from '../../config/baseEntity';
 import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
 import { OrderEntity } from 'src/order/entity/order.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -49,4 +50,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
+
+  @OneToMany(() => VoucherEntity, (voucher) => voucher.user)
+  vouchers: VoucherEntity[];
 }

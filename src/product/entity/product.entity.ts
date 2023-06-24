@@ -1,6 +1,13 @@
+import { CartItemEntity } from 'src/cart_item/entity/cart_item.entity';
 import { BaseEntity } from 'src/config/baseEntity';
 import { ShopEntity } from 'src/shop/entity/shop.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseEntity {
@@ -45,4 +52,7 @@ export class ProductEntity extends BaseEntity {
 
   @ManyToOne(() => ShopEntity, (shop) => shop.products)
   shop: ShopEntity;
+
+  @OneToMany(() => CartItemEntity, (cart) => cart.product)
+  cartItem: CartItemEntity[];
 }

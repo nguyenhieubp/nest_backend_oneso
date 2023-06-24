@@ -8,8 +8,7 @@ export class CartItemEntity extends BaseEntity {
   @Column('uuid')
   productId: ProductEntity;
 
-  @OneToOne(() => ProductEntity)
-  @JoinColumn()
+  @ManyToOne(() => ProductEntity, (product) => product.cartItem)
   product: ProductEntity;
 
   @Column('uuid')

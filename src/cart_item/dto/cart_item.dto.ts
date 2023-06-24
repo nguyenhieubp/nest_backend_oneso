@@ -8,12 +8,12 @@ export class CartItemDto extends BaseDto {
   @Expose()
   @IsUUID()
   @IsNotEmpty()
-  product: ProductEntity;
+  productId: ProductEntity;
 
   @Expose()
   @IsUUID()
   @IsNotEmpty()
-  cart: CartEntity;
+  cartId: CartEntity;
 
   @Expose()
   @IsNotEmpty()

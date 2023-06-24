@@ -13,6 +13,7 @@ import { OrderEntity } from 'src/order/entity/order.entity';
 import { OrderItemEntity } from 'src/order_item/entity/order_item.entity';
 import { CartEntity } from 'src/cart/entity/cart.entity';
 import { CartItemEntity } from 'src/cart_item/entity/cart_item.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 env.config();
 
 @Module({
@@ -36,6 +37,7 @@ env.config();
         OrderEntity,
         CartEntity,
         CartItemEntity,
+        VoucherEntity,
       ],
       synchronize: true,
     }),

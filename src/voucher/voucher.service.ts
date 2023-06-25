@@ -39,6 +39,14 @@ export class VoucherService {
     return vouchesFilterExpire;
   }
 
+  async setUseVoucher(id: string, idOrder: string): Promise<VoucherEntity> {
+    const voucher = await this.voucherRepository.findOneById(id);
+    voucher.isUse = true;
+    voucher.orderId = idOrder;
+    await this.voucherRepository.update(id, voucher);
+    return await this.voucherRepository.findOneById(id);
+  }
+
   async deleteVoucher(id: string): Promise<string> {
     await this.voucherRepository.delete(id);
     return 'DELETE SUCCESS';

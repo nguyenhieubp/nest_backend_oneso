@@ -13,6 +13,10 @@ export class ProductService {
     private readonly productRepository: Repository<ProductEntity>,
   ) {}
 
+  public async priceProduct(price: number, quantity: number) {
+    return price * quantity;
+  }
+
   public async createProduct(
     files: Express.Multer.File[],
     res: Response,

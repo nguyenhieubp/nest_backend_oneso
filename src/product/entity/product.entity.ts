@@ -1,5 +1,6 @@
 import { CartItemEntity } from 'src/cart_item/entity/cart_item.entity';
 import { BaseEntity } from 'src/config/baseEntity';
+import { OrderEntity } from 'src/order/entity/order.entity';
 import { ShopEntity } from 'src/shop/entity/shop.entity';
 import {
   Column,
@@ -55,4 +56,7 @@ export class ProductEntity extends BaseEntity {
 
   @OneToMany(() => CartItemEntity, (cart) => cart.product)
   cartItem: CartItemEntity[];
+
+  @OneToMany(() => OrderEntity, (order) => order.product)
+  orders: OrderEntity[];
 }

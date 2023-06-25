@@ -15,7 +15,8 @@ export class WalletEntity extends BaseEntity {
   id: string;
 
   @Column({ default: 0 })
-  commission: number;
+  //quỹ hoa hồng
+  commission_fund: number;
 
   @Column({ default: 0 })
   consumer_wallet: number;

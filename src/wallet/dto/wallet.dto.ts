@@ -5,7 +5,7 @@ import { UserEntity } from 'src/user/user.entity/user.entity';
 
 export class WalletDto extends BaseDto {
   @Expose()
-  commission: number;
+  commission_fund: number;
 
   @Expose()
   consumer_wallet: number;

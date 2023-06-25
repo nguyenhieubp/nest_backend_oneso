@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { VoucherDto } from './dto/voucher.dto';
 import { VoucherEntity } from './entity/voucher.entity';

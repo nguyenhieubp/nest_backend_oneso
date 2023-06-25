@@ -22,5 +22,6 @@ import { VoucherModule } from 'src/voucher/voucher.module';
   ],
   controllers: [CartItemController],
   providers: [CartItemService],
+  exports: [CartItemService],
 })
 export class CartItemModule {}

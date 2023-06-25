@@ -1,30 +1,40 @@
 import { AddressUserEntity } from 'src/address_user/entity/address_user.entity';
 import { BaseEntity } from 'src/config/baseEntity';
-import { OrderItemEntity } from 'src/order_item/entity/order_item.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { UserEntity } from 'src/user/user.entity/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 @Entity({ name: 'orders' })
 export class OrderEntity extends BaseEntity {
-  @Column('uuid')
-  userId: UserEntity;
-
-  @ManyToOne(() => UserEntity, (user) => user.orders)
-  user: UserEntity;
-
-  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order)
-  orderItems: OrderEntity[];
+  @Column()
+  quantity: number;
 
   @Column()
-  price: string;
+  price: number;
 
-  @Column()
+  @Column({ nullable: true })
   comment: string;
+
+  @Column()
+  type_pay: string;
+
+  @OneToMany(() => VoucherEntity, (voucher) => voucher.order, {
+    onDelete: 'CASCADE',
+  })
+  vouchers: VoucherEntity[];
+
+  @Column('uuid')
+  productId: string;
+
+  @ManyToOne(() => ProductEntity, (product) => product.orders, {
+    onDelete: 'CASCADE',
+  })
+  product: ProductEntity;
+
+  @Column('uuid')
+  userId: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: 'CASCADE' })
+  user: UserEntity;
 }

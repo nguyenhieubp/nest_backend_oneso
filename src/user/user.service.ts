@@ -134,4 +134,9 @@ export class UserService {
     await this.userRepository.update(id, { address: addressId });
     return await this.userRepository.findOneById(id);
   }
+
+  async findUserByReferralCode(code: string): Promise<UserEntity | any> {
+    const user = await this.userRepository.findOneBy({ user_code: code });
+    return user;
+  }
 }

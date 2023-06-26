@@ -29,7 +29,6 @@ export class UserController {
   }
 
   @Get('findById/:id')
-  @UseGuards(JwtGuard)
   findUserById(@Param('id') id: string): Promise<UserEntity> {
     return this.userService.findUserById(id);
   }

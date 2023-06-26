@@ -51,4 +51,9 @@ export class VoucherService {
     await this.voucherRepository.delete(id);
     return 'DELETE SUCCESS';
   }
+
+  async getItemVoucher(id: string): Promise<number> {
+    const voucher = await this.voucherRepository.findOneById(id);
+    return voucher.value_discount;
+  }
 }

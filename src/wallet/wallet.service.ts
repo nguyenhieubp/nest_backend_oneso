@@ -52,7 +52,10 @@ export class WalletService {
     id: string,
     money: number,
   ): Promise<WalletEntity | string> {
-    const wallet = await this.walletRepository.findOneById(id);
+    const wallet = await this.walletRepository
+      .createQueryBuilder('wallets')
+      .where('wallets.user =:id', { id: id })
+      .getOne();
     if (money < 0) {
       return 'Need greater than 0';
     }
@@ -91,7 +94,11 @@ export class WalletService {
     id: string,
     money: number,
   ): Promise<WalletEntity | string> {
-    const wallet = await this.walletRepository.findOneById(id);
+    const wallet = await this.walletRepository
+      .createQueryBuilder('wallets')
+      .where('wallets.user =:id', { id: id })
+      .getOne();
+
     if (money < 0) {
       return 'Account not enough';
     }

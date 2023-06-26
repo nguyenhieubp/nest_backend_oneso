@@ -8,5 +8,6 @@ import { FundEntity } from './entity/fund.entity';
   imports: [TypeOrmModule.forFeature([FundEntity])],
   controllers: [FundController],
   providers: [FundService],
+  exports: [FundService],
 })
 export class FundModule {}

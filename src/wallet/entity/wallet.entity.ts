@@ -1,4 +1,5 @@
 import { BaseEntity } from 'src/config/baseEntity';
+import { ShopEntity } from 'src/shop/entity/shop.entity';
 import { UserEntity } from 'src/user/user.entity/user.entity';
 import {
   Column,
@@ -24,10 +25,17 @@ export class WalletEntity extends BaseEntity {
   @Column({ default: 0 })
   oneso_pay: number;
 
-  @Column('uuid')
+  @Column('uuid', { nullable: true })
   userId: UserEntity;
 
-  @OneToOne(() => UserEntity)
+  @OneToOne(() => UserEntity, { nullable: true })
   @JoinColumn()
   user: UserEntity;
+
+  @Column('uuid', { nullable: true })
+  shopId: ShopEntity;
+
+  @OneToOne(() => ShopEntity, { nullable: true })
+  @JoinColumn()
+  shop: ShopEntity;
 }

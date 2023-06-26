@@ -1,6 +1,14 @@
 import { BaseEntity } from 'src/config/baseEntity';
 import { ProductEntity } from 'src/product/entity/product.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { WalletEntity } from 'src/wallet/entity/wallet.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'shops' })
 export class ShopEntity extends BaseEntity {

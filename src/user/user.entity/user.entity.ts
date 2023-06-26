@@ -41,10 +41,10 @@ export class UserEntity extends BaseEntity {
   @Column({ default: '' })
   refresh_token: string;
 
-  @Column('uuid')
-  addressId: AddressUserEntity;
+  @Column('uuid', { nullable: true })
+  addressId: string;
 
-  @OneToOne(() => AddressUserEntity)
+  @OneToOne(() => AddressUserEntity, { nullable: true })
   @JoinColumn()
   address: AddressUserEntity;
 

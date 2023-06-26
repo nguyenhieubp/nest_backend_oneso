@@ -107,7 +107,7 @@ export class ShopController {
     return this.shopService.uploadBannerShop(id, res, file);
   }
 
-  @Put('update/shop/:id')
+  @Put('update/:id')
   updateShop(
     @Param('id') id: string,
     @Body() dataShopUpdate: any,

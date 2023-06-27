@@ -8,6 +8,7 @@ import { VoucherModule } from 'src/voucher/voucher.module';
 import { UserModule } from 'src/user/user.module';
 import { FundModule } from 'src/fund/fund.module';
 import { WalletModule } from 'src/wallet/wallet.module';
+import { UserRightModule } from 'src/user-right/user-right.module';
 
 @Module({
   controllers: [OrderController],
@@ -19,6 +20,7 @@ import { WalletModule } from 'src/wallet/wallet.module';
     UserModule,
     FundModule,
     WalletModule,
+    UserRightModule,
   ],
 })
 export class OrderModule {}

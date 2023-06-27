@@ -15,10 +15,24 @@ export class WalletService {
     return await this.walletRepository.save(wallet);
   }
 
+  async getWalletById(id: string): Promise<WalletEntity> {
+    return await this.walletRepository
+      .createQueryBuilder('wallets')
+      .where('wallets.id =:id', { id: id })
+      .getOne();
+  }
+
   async getWalletByUser(id: string): Promise<WalletEntity> {
     return await this.walletRepository
       .createQueryBuilder('wallets')
       .where('wallets.user =:id', { id: id })
+      .getOne();
+  }
+
+  async getWalletByShop(id: string): Promise<WalletEntity> {
+    return await this.walletRepository
+      .createQueryBuilder('wallets')
+      .where('wallets.shop =:id', { id: id })
       .getOne();
   }
 
@@ -93,7 +107,7 @@ export class WalletService {
   async updateCommissionUp(
     id: string,
     money: number,
-  ): Promise<WalletEntity | string> {
+  ): Promise<WalletEntity | string | number> {
     const wallet = await this.walletRepository
       .createQueryBuilder('wallets')
       .where('wallets.user =:id', { id: id })
@@ -104,6 +118,6 @@ export class WalletService {
     }
     wallet.commission_fund += money;
     await this.walletRepository.save(wallet);
-    return await this.walletRepository.findOneById(id);
+    return wallet.commission_fund;
   }
 }

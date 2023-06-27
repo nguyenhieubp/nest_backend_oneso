@@ -13,8 +13,17 @@ export class ProductService {
     private readonly productRepository: Repository<ProductEntity>,
   ) {}
 
-  public async priceProduct(price: number, quantity: number) {
-    return price * quantity;
+  public async priceProduct(
+    productId: string,
+    quantity: number,
+    typePay: string,
+  ) {
+    const product = await this.productRepository.findOneById(productId);
+    if (typePay === 'online') {
+      return quantity * product.price_online;
+    } else if (typePay === 'offline') {
+      return quantity * product.price_direct;
+    }
   }
 
   public async createProduct(

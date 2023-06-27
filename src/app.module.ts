@@ -17,6 +17,7 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './config/transform.interceptor';
 import { GlobalExceptionFilter } from './config/exceptionFilter';
 import { VoucherModule } from './voucher/voucher.module';
+import { UserRightModule } from './user-right/user-right.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { VoucherModule } from './voucher/voucher.module';
     CartModule,
     CartItemModule,
     VoucherModule,
+    UserRightModule,
   ],
   controllers: [AppController],
   providers: [

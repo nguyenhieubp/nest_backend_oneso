@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { FundService } from 'src/fund/fund.service';
 import * as dotenv from 'dotenv';
 import { WalletService } from 'src/wallet/wallet.service';
+import { UserRightService } from '../user-right/user-right.service';
 dotenv.config();
 
 @Injectable()
@@ -19,6 +20,7 @@ export class OrderService {
     private readonly walletService: WalletService,
     private readonly userService: UserService,
     private readonly fundService: FundService,
+    private readonly userRight: UserRightService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
   ) {}
@@ -35,12 +37,12 @@ export class OrderService {
 
   async orderByVoucher(order: OrderDto, idUser: string): Promise<OrderEntity> {
     const { vouchers, ...dataOrder } = order;
-    await this.checkWalletShop(order.productId);
 
     //GET PRICE VS QUANTITY PRODUCT
     const priceOrder = await this.productService.priceProduct(
-      dataOrder.price,
+      dataOrder.productId,
       dataOrder.quantity,
+      dataOrder.type_pay,
     );
 
     //SAVE ORDER
@@ -49,33 +51,34 @@ export class OrderService {
     //******************* */
     //******************* */
     //******************* */
+
     //* percent discount order */
     const percentDiscount = await this.applyVoucher(
       order.vouchers,
       newOrder.id,
     );
-    if (vouchers.length <= 0) {
-      await this.orderRepository.save({ ...newOrder, price: priceOrder });
-      /**CHECK USER REFERRAL CODE */
-      await this.checkUserReferralCode(
-        idUser,
-        dataOrder.productId,
-        dataOrder.type_pay,
-        vouchers,
-        dataOrder.quantity,
-      );
 
-      //RETURN RESULT ORDER
-      return this.generateOrder(newOrder.id);
-    }
-
-    const priceOrderReal = Number(priceOrder) * (Number(percentDiscount) / 100);
+    //SET PRICE ODER
+    const priceOrderReal =
+      Number(priceOrder) - Number(priceOrder) * (Number(percentDiscount) / 100);
     await this.orderRepository.save({ ...newOrder, price: priceOrderReal });
 
     //******************* */
+    //SHOP GET MONEY
+    await this.walletShopUserBuy(
+      dataOrder.productId,
+      Number(priceOrderReal) -
+        Number(
+          await this.userRight.countFundDiscount(
+            dataOrder.productId,
+            dataOrder.type_pay,
+            dataOrder.quantity,
+          ),
+        ),
+    );
 
     /**CHECK USER REFERRAL CODE */
-    await this.checkUserReferralCode(
+    await this.countMoneyForFriend(
       idUser,
       dataOrder.productId,
       dataOrder.type_pay,
@@ -83,10 +86,41 @@ export class OrderService {
       dataOrder.quantity,
     );
 
+    if (vouchers.length <= 0) {
+      await this.orderRepository.save({ ...newOrder, price: priceOrder });
+      /**CHECK USER REFERRAL CODE */
+      await this.countMoneyForFriend(
+        idUser,
+        dataOrder.productId,
+        dataOrder.type_pay,
+        vouchers,
+        dataOrder.quantity,
+      );
+
+      //SHOP GET MONEY
+      await this.walletShopUserBuy(
+        dataOrder.productId,
+        Number(priceOrderReal) -
+          Number(
+            await this.userRight.countFundDiscount(
+              dataOrder.productId,
+              dataOrder.type_pay,
+              dataOrder.quantity,
+            ),
+          ),
+      );
+
+      //RETURN RESULT ORDER
+      return this.generateOrder(newOrder.id);
+    }
+
     //RETURN RESULT ORDER
     return this.generateOrder(newOrder.id);
   }
 
+  //**APPLY VOUCHERS */
+  //**SET VOUCHER USE FOR ORDER SAVE DB */
+  //**COUNT PERCENT DISCOUNT */
   async applyVoucher(vouchers: string[], orderId: string): Promise<number> {
     //SET DATABASE VOUCHER APPLY ORDER
     vouchers.map((item) => {
@@ -104,7 +138,20 @@ export class OrderService {
     return percentDiscount;
   }
 
-  async checkUserReferralCode(
+  //SET WALLET SHOP
+  async walletShopUserBuy(id: string, money: number) {
+    const product = await this.productService.getItemProduct(id);
+    const wallet = await this.walletService.getWalletByShop(
+      product.shopId.toString(),
+    );
+    await this.walletService.updateOnesoPayUp(wallet.id, money);
+    return wallet;
+  }
+
+  /********* */
+  /**COUNT MONEY FOR FRIEND AND GET MONEY TO WALLET */
+  /********* */
+  async countMoneyForFriend(
     id: string,
     productId: string,
     typePay: string,
@@ -123,197 +170,31 @@ export class OrderService {
 
       //IF USER USE VOUCHER
       if (isUseVoucher) {
-        if (friend.level === 'T1') {
-          const moneyCommission = await this.userUseVouchers(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (10 / 100)),
-          );
-          return moneyCommission;
-        } else if (friend.level === 'T2') {
-          const moneyCommission = await this.userUseVouchers(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (15 / 100)),
-          );
-
-          return moneyCommission * (15 / 100);
-        } else if (friend.level === 'T3') {
-          const moneyCommission = await this.userUseVouchers(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (20 / 100)),
-          );
-          return moneyCommission;
-        }
-      } else {
-        if (friend.level === 'T1') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (30 / 100) * (10 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (70 / 100),
-          );
-          return Number(moneyCommission * (30 / 100) * (10 / 100));
-        } else if (friend.level === 'T2') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (30 / 100) * (15 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (70 / 100),
-          );
-          return Number(moneyCommission * (30 / 100) * (15 / 100));
-        } else if (friend.level === 'T3') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (30 / 100) * (20 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (70 / 100),
-          );
-          return Number(moneyCommission * (30 / 100) * (20 / 100));
-        }
+        await this.userRight.friendGetMoneyWhenByVoucher(
+          productId,
+          typePay,
+          quantity,
+          friend.level,
+          friend.id,
+        );
+      } else if (user.level === 'T1' && !isUseVoucher) {
+        await this.userRight.friendGetMoneyWhenByNormal(
+          productId,
+          typePay,
+          quantity,
+          friend.level,
+          friend.id,
+        );
       }
-      if (user.level === 'T2') {
-        if (friend.level === 'T1') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (50 / 100) * (10 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (50 / 100),
-          );
-          return Number(moneyCommission * (50 / 100) * (10 / 100));
-        } else if (friend.level === 'T2') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (50 / 100) * (15 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (50 / 100),
-          );
-          return Number(moneyCommission * (50 / 100) * (15 / 100));
-        } else if (friend.level === 'T3') {
-          const moneyCommission = await this.countFundDiscount(
-            productId,
-            typePay,
-            quantity,
-          );
-          await this.walletService.updateCommissionUp(
-            friend.id,
-            Number(moneyCommission * (50 / 100) * (20 / 100)),
-          );
-          //FUNDPOLICY
-          await this.fundService.policyFundUp(
-            process.env.FUND_MONEY,
-            moneyCommission * (50 / 100),
-          );
-          return Number(moneyCommission * (50 / 100) * (20 / 100));
-        }
+      if (user.level === 'T2' && !isUseVoucher) {
+        await this.userRight.friendGetMoneyWhenByFriendT2(
+          productId,
+          typePay,
+          quantity,
+          friend.level,
+          friend.id,
+        );
       }
     }
-  }
-
-  async userUseVouchers(productId: string, typePay: string, quantity: number) {
-    const moneyDiscount = await this.countFundDiscount(
-      productId,
-      typePay,
-      quantity,
-    );
-    const policyFund = (15 / 100) * Number(moneyDiscount);
-    await this.fundService.policyFundUp(
-      process.env.FUND_MONEY,
-      (85 / 100) * Number(moneyDiscount),
-    );
-    return policyFund;
-  }
-
-  async countFundDiscount(
-    productId: string,
-    typePay: string,
-    quantity: number,
-  ) {
-    const product = await this.productService.getItemProduct(productId);
-
-    if (typePay === 'online') {
-      const moneyDiscount =
-        Number(product.price_online) *
-        quantity *
-        (Number(product.discount_price_online) / 100);
-      await this.fundService.discountFundUp(
-        process.env.FUND_MONEY,
-        moneyDiscount,
-      );
-
-      return moneyDiscount;
-    } else if (typePay === 'offline') {
-      const moneyDiscount =
-        Number(product.price_direct) *
-        quantity *
-        (Number(product.discount_direct_price) / 100);
-      await this.fundService.discountFundUp(
-        process.env.FUND_MONEY,
-        moneyDiscount,
-      );
-
-      return moneyDiscount;
-    }
-  }
-
-  async checkWalletShop(id: string) {
-    const product = await this.productService.getItemProduct(id);
-    // const wallet = await this.walletService.getWalletByUser(
-    //   product.shopId.toString(),
-    // );
-    console.log(product.shop);
   }
 }

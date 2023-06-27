@@ -90,6 +90,7 @@ export class UserService {
         'phone_number',
         'referral_code',
         'address',
+        'level',
         'user_code',
         'create_at',
         'update_at',

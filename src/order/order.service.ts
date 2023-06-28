@@ -17,10 +17,8 @@ export class OrderService {
   constructor(
     private readonly voucherService: VoucherService,
     private readonly productService: ProductService,
-    private readonly walletService: WalletService,
     private readonly userService: UserService,
-    private readonly fundService: FundService,
-    private readonly userRight: UserRightService,
+    private readonly userRightService: UserRightService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
   ) {}
@@ -64,28 +62,8 @@ export class OrderService {
     await this.orderRepository.save({ ...newOrder, price: priceOrderReal });
 
     //******************* */
-    //SHOP GET MONEY
-    await this.walletShopUserBuy(
-      dataOrder.productId,
-      Number(priceOrderReal) -
-        Number(
-          await this.userRight.countFundDiscount(
-            dataOrder.productId,
-            dataOrder.type_pay,
-            dataOrder.quantity,
-          ),
-        ),
-    );
 
-    /**CHECK USER REFERRAL CODE */
-    await this.countMoneyForFriend(
-      idUser,
-      dataOrder.productId,
-      dataOrder.type_pay,
-      vouchers,
-      dataOrder.quantity,
-    );
-
+    // CHECK USER USE VOUCHER FOR ORDER
     if (vouchers.length <= 0) {
       await this.orderRepository.save({ ...newOrder, price: priceOrder });
       /**CHECK USER REFERRAL CODE */
@@ -95,27 +73,23 @@ export class OrderService {
         dataOrder.type_pay,
         vouchers,
         dataOrder.quantity,
-      );
-
-      //SHOP GET MONEY
-      await this.walletShopUserBuy(
-        dataOrder.productId,
-        Number(priceOrderReal) -
-          Number(
-            await this.userRight.countFundDiscount(
-              dataOrder.productId,
-              dataOrder.type_pay,
-              dataOrder.quantity,
-            ),
-          ),
+        priceOrderReal,
       );
 
       //RETURN RESULT ORDER
       return this.generateOrder(newOrder.id);
+    } else {
+      await this.countMoneyForFriend(
+        idUser,
+        dataOrder.productId,
+        dataOrder.type_pay,
+        vouchers,
+        dataOrder.quantity,
+        priceOrderReal,
+      );
+      //RETURN RESULT ORDER
+      return this.generateOrder(newOrder.id);
     }
-
-    //RETURN RESULT ORDER
-    return this.generateOrder(newOrder.id);
   }
 
   //**APPLY VOUCHERS */
@@ -138,16 +112,6 @@ export class OrderService {
     return percentDiscount;
   }
 
-  //SET WALLET SHOP
-  async walletShopUserBuy(id: string, money: number) {
-    const product = await this.productService.getItemProduct(id);
-    const wallet = await this.walletService.getWalletByShop(
-      product.shopId.toString(),
-    );
-    await this.walletService.updateOnesoPayUp(wallet.id, money);
-    return wallet;
-  }
-
   /********* */
   /**COUNT MONEY FOR FRIEND AND GET MONEY TO WALLET */
   /********* */
@@ -157,6 +121,7 @@ export class OrderService {
     typePay: string,
     vouches: Array<string>,
     quantity: number,
+    price: number,
   ) {
     const user = await this.userService.findUserById(id);
     //CHECK USER USE VOUCHER
@@ -170,29 +135,32 @@ export class OrderService {
 
       //IF USER USE VOUCHER
       if (isUseVoucher) {
-        await this.userRight.friendGetMoneyWhenByVoucher(
+        await this.userRightService.friendGetMoneyWhenByVoucher(
           productId,
           typePay,
           quantity,
           friend.level,
           friend.id,
+          price,
         );
       } else if (user.level === 'T1' && !isUseVoucher) {
-        await this.userRight.friendGetMoneyWhenByNormal(
+        await this.userRightService.friendGetMoneyWhenByNormal(
           productId,
           typePay,
           quantity,
           friend.level,
           friend.id,
+          price,
         );
       }
       if (user.level === 'T2' && !isUseVoucher) {
-        await this.userRight.friendGetMoneyWhenByFriendT2(
+        await this.userRightService.friendGetMoneyWhenByFriendT2(
           productId,
           typePay,
           quantity,
           friend.level,
           friend.id,
+          price,
         );
       }
     }

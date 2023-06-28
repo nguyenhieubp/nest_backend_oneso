@@ -169,4 +169,9 @@ export class ProductService {
       .skip(skip)
       .getMany();
   }
+
+  public async getShopByProduct(productId: string): Promise<string> {
+    const product = await this.productRepository.findOneById(productId);
+    return product.shopId.toString();
+  }
 }

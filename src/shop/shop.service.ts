@@ -107,10 +107,14 @@ export class ShopService {
   }
 
   async getShopByBusinessArena(arena: string): Promise<Array<ShopEntity>> {
-    return this.shopRepository.findBy({ business_arena: arena });
+    return await this.shopRepository.findBy({ business_arena: arena });
   }
 
   async getAllShop(): Promise<Array<ShopEntity>> {
     return this.shopRepository.find();
+  }
+
+  async getShopById(id: string) {
+    return await this.shopRepository.findOneById(id);
   }
 }

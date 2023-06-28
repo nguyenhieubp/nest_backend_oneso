@@ -8,6 +8,8 @@ import { WalletModule } from 'src/wallet/wallet.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/user.entity/user.entity';
 import { WalletEntity } from 'src/wallet/entity/wallet.entity';
+import { ShopService } from 'src/shop/shop.service';
+import { ShopModule } from 'src/shop/shop.module';
 
 @Module({
   controllers: [UserRightController],
@@ -19,6 +21,7 @@ import { WalletEntity } from 'src/wallet/entity/wallet.entity';
     UserModule,
     FundModule,
     WalletModule,
+    ShopModule,
   ],
 })
 export class UserRightModule {}

@@ -28,5 +28,6 @@ dotenv.config();
   ],
   controllers: [ShopController],
   providers: [ShopService],
+  exports: [ShopService],
 })
 export class ShopModule {}

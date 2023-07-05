@@ -1,8 +1,11 @@
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RefreshJwtGuard } from './guard/refresh_jwt.guard';
 import { Controller, Get, UseGuards, Req, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { GoogleAuthGuard } from './guard/google.guard';
+
 @Controller('')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly userService: UserService) {}
 
@@ -18,6 +21,7 @@ export class AuthController {
 
   @Post('refreshToken')
   @UseGuards(RefreshJwtGuard)
+  @ApiBearerAuth('JWT-auth')
   refreshToken(@Req() req): Promise<{ access_token: string }> {
     return this.userService.refreshToken(req.user);
   }

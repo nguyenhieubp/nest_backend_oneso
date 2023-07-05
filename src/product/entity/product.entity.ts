@@ -49,7 +49,7 @@ export class ProductEntity extends BaseEntity {
   isShow: boolean;
 
   @Column('uuid')
-  shopId: ShopEntity;
+  shopId: string;
 
   @ManyToOne(() => ShopEntity, (shop) => shop.products)
   shop: ShopEntity;

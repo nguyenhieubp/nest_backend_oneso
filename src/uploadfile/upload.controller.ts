@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   Body,
@@ -15,6 +16,7 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 
 @Controller('file')
+@ApiTags('Upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 

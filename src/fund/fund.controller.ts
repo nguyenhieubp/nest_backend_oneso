@@ -1,8 +1,10 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Controller, Post, Body, Patch, Param } from '@nestjs/common';
 import { FundService } from './fund.service';
 import { FundDto } from './dto/fund.dto';
 
 @Controller('fund')
+@ApiTags('Fund')
 export class FundController {
   constructor(private readonly fundService: FundService) {}
 

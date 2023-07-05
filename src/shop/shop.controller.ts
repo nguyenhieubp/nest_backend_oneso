@@ -1,3 +1,5 @@
+import { ApiBody, ApiCookieAuth } from '@nestjs/swagger/dist';
+import { ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -19,14 +21,19 @@ import { OtpService } from 'src/otp/otp.service';
 import { Request, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { OrderService } from 'src/order/order.service';
+import { ProductEntity } from 'src/product/entity/product.entity';
 
 @Controller('shop')
+@ApiTags('Shop')
 export class ShopController {
   constructor(
     private readonly shopService: ShopService,
     private readonly otpService: OtpService,
+    private readonly orderService: OrderService,
   ) {}
 
+  @ApiBody({ type: ShopDto })
   @Post()
   registerShop(@Body() shop: ShopDto): Promise<ShopEntity> {
     const shopReal = ShopDto.plainToClass(shop);
@@ -34,11 +41,13 @@ export class ShopController {
   }
 
   @Get('verify-shop')
+  @ApiCookieAuth('access_token_shop')
   async verifyShop(@Req() req: Request): Promise<ShopEntity> {
     return this.shopService.verifyShop(req);
   }
 
   @Post('refresh-token')
+  @ApiCookieAuth()
   async refreshToken(
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
@@ -130,5 +139,25 @@ export class ShopController {
   @Get('')
   getAllShop(): Promise<Array<ShopEntity>> {
     return this.shopService.getAllShop();
+  }
+
+  @Get(':id/order/online')
+  getAllOrderOnlineOfShop(@Param('id') id: string) {
+    return this.orderService.getAllOrderOnlineOfShop(id);
+  }
+
+  @Get(':id/order/online/purchased')
+  getAllOrderOnlineOfShopPurchased(@Param('id') id: string) {
+    return this.orderService.getAllOrderOnlineOfShopPurchased(id);
+  }
+
+  @Get(':id/order/offline')
+  getAllOrderOfflineShop(@Param('id') id: string) {
+    return this.orderService.getAllOrderOfflineShop(id);
+  }
+
+  @Get(':id/order/offline/purchased')
+  getAllOrderOfflineShopPurchased(@Param('id') id: string) {
+    return this.orderService.getAllOrderOfflineShopPurchased(id);
   }
 }

@@ -1,8 +1,10 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request } from 'express';
 
-@Controller()
+@Controller('')
+@ApiTags('Start')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 

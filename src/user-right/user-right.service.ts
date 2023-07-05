@@ -276,16 +276,14 @@ export class UserRightService {
     // Ngày đầu tiên của tháng
     const startDate = new Date(
       new Date().getFullYear(),
-      //   new Date().getMonth() - 1,
-      5,
+      new Date().getMonth() - 1,
       1,
     );
 
     // Ngày cuối cùng của tháng
     const endDate = new Date(
       new Date().getFullYear(),
-      //   new Date().getMonth(),
-      5,
+      new Date().getMonth(),
       30,
     );
 
@@ -324,7 +322,7 @@ export class UserRightService {
 
     switch (user.level) {
       case 'T1':
-        walletOfUser.oneso_pay = (10 / 100) * managementFund;
+        walletOfUser.consumer_wallet = (10 / 100) * managementFund;
         //SAVE DECREMENT VALUE
         await this.fundService.managerFundDown(
           process.env.FUND_MONEY,
@@ -333,7 +331,7 @@ export class UserRightService {
         await this.walletRepository.save(walletOfUser);
         break;
       case 'T2':
-        walletOfUser.oneso_pay = (20 / 100) * managementFund;
+        walletOfUser.consumer_wallet = (20 / 100) * managementFund;
         //SAVE DECREMENT VALUE
         await this.fundService.managerFundDown(
           process.env.FUND_MONEY,
@@ -342,7 +340,7 @@ export class UserRightService {
         await this.walletRepository.save(walletOfUser);
         break;
       case 'T3':
-        walletOfUser.oneso_pay = (40 / 100) * managementFund;
+        walletOfUser.consumer_wallet = (40 / 100) * managementFund;
         //SAVE DECREMENT VALUE
         await this.fundService.managerFundDown(
           process.env.FUND_MONEY,

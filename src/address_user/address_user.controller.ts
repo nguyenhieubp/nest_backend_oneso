@@ -10,8 +10,10 @@ import {
 import { AddressUserService } from './address_user.service';
 import { AddressUserDto } from './dto/address_user.dto';
 import { AddressUserEntity } from './entity/address_user.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('address')
+@ApiTags('Address')
 export class AddressUserController {
   constructor(private readonly addressUserService: AddressUserService) {}
 

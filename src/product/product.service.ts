@@ -36,7 +36,7 @@ export class ProductService {
       path.join(__dirname, '../../uploads', fileName),
     );
 
-    const productReal = ProductDto.plainToClass({
+    const productReal: any = ProductDto.plainToClass({
       banner_products: imagePaths,
       ...product,
     });

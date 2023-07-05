@@ -6,10 +6,10 @@ import { OrderEntity } from './entity/order.entity';
 import { Repository } from 'typeorm';
 import { ProductService } from 'src/product/product.service';
 import { UserService } from 'src/user/user.service';
-import { FundService } from 'src/fund/fund.service';
+import { UserRightService } from '../user-right/user-right.service';
 import * as dotenv from 'dotenv';
 import { WalletService } from 'src/wallet/wallet.service';
-import { UserRightService } from '../user-right/user-right.service';
+import { WalletEntity } from 'src/wallet/entity/wallet.entity';
 dotenv.config();
 
 @Injectable()
@@ -18,12 +18,15 @@ export class OrderService {
     private readonly voucherService: VoucherService,
     private readonly productService: ProductService,
     private readonly userService: UserService,
+    private readonly walletService: WalletService,
     private readonly userRightService: UserRightService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(WalletEntity)
+    private readonly walletRepository: Repository<WalletEntity>,
   ) {}
 
-  async generateOrder(id: string): Promise<OrderEntity> {
+  async generateOrderById(id: string): Promise<OrderEntity> {
     return this.orderRepository
       .createQueryBuilder('orders')
       .leftJoinAndSelect('orders.user', 'user')
@@ -33,7 +36,10 @@ export class OrderService {
       .getOne();
   }
 
-  async orderByVoucher(order: OrderDto, idUser: string): Promise<OrderEntity> {
+  async createOrder(
+    order: OrderDto,
+    idUser: string,
+  ): Promise<OrderEntity | string> {
     const { vouchers, ...dataOrder } = order;
 
     //GET PRICE VS QUANTITY PRODUCT
@@ -46,10 +52,6 @@ export class OrderService {
     //SAVE ORDER
     const newOrder = await this.orderRepository.save(dataOrder);
 
-    //******************* */
-    //******************* */
-    //******************* */
-
     //* percent discount order */
     const percentDiscount = await this.applyVoucher(
       order.vouchers,
@@ -61,35 +63,38 @@ export class OrderService {
       Number(priceOrder) - Number(priceOrder) * (Number(percentDiscount) / 100);
     await this.orderRepository.save({ ...newOrder, price: priceOrderReal });
 
-    //******************* */
+    /**CHECK USER REFERRAL CODE */
+    await this.countMoneyForFriend(
+      idUser,
+      dataOrder.productId,
+      dataOrder.type_pay,
+      vouchers,
+      dataOrder.quantity,
+      priceOrderReal,
+    );
+
+    if (order.type_pay === 'online') {
+      //SET MONEY USER
+      const isSuccess = await this.setMoneyUserBuy(idUser, priceOrderReal);
+      if (isSuccess === false) {
+        return 'Not enough money';
+      }
+    }
 
     // CHECK USER USE VOUCHER FOR ORDER
     if (vouchers.length <= 0) {
       await this.orderRepository.save({ ...newOrder, price: priceOrder });
-      /**CHECK USER REFERRAL CODE */
-      await this.countMoneyForFriend(
-        idUser,
-        dataOrder.productId,
-        dataOrder.type_pay,
-        vouchers,
-        dataOrder.quantity,
-        priceOrderReal,
-      );
-
-      //RETURN RESULT ORDER
-      return this.generateOrder(newOrder.id);
-    } else {
-      await this.countMoneyForFriend(
-        idUser,
-        dataOrder.productId,
-        dataOrder.type_pay,
-        vouchers,
-        dataOrder.quantity,
-        priceOrderReal,
-      );
-      //RETURN RESULT ORDER
-      return this.generateOrder(newOrder.id);
+      if (order.type_pay === 'online') {
+        //SET MONEY USER
+        const isSuccess = await this.setMoneyUserBuy(idUser, priceOrder);
+        if (isSuccess === false) {
+          return 'Not enough money';
+        }
+      }
+      return this.generateOrderById(newOrder.id);
     }
+    //RETURN RESULT ORDER
+    return this.generateOrderById(newOrder.id);
   }
 
   //**APPLY VOUCHERS */
@@ -163,6 +168,130 @@ export class OrderService {
           price,
         );
       }
+    }
+  }
+
+  async getAllOrder(): Promise<Array<OrderEntity>> {
+    return this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('orders.product', 'product')
+      .leftJoinAndSelect('user.address', 'address')
+      .getMany();
+  }
+
+  async getItemOrder(id: string): Promise<OrderEntity> {
+    return await this.generateOrderById(id);
+  }
+
+  async getOrderByUserWait(id: string): Promise<Array<OrderEntity>> {
+    return await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('orders.product', 'product')
+      .leftJoinAndSelect('user.address', 'address')
+      .where('orders.user =:userId AND orders.isPurchase = FALSE ', {
+        userId: id,
+      })
+      .getMany();
+  }
+
+  async getOrderByUserSuccess(id: string): Promise<Array<OrderEntity>> {
+    return await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('orders.product', 'product')
+      .leftJoinAndSelect('user.address', 'address')
+      .where('orders.user =:userId AND orders.isPurchase = TRUE ', {
+        userId: id,
+      })
+      .getMany();
+  }
+
+  async commentOrder(id: string, comment: string): Promise<string> {
+    const order = await this.orderRepository.findOneById(id);
+    order.comment = comment;
+    await this.orderRepository.save(order);
+    return comment;
+  }
+
+  async deleteOrder(id: string): Promise<string> {
+    await this.orderRepository.delete(id);
+    return 'DELETE SUCCESS';
+  }
+
+  async setPurchaser(id: string): Promise<boolean> {
+    const order = await this.orderRepository.findOneById(id);
+    order.isPurchase = true;
+    await this.orderRepository.save(order);
+    return true;
+  }
+
+  async getAllOrderOnlineOfShop(id: string) {
+    const orders = await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.product', 'product')
+      .where(
+        'product.shopId =:shopId AND orders.type_pay = :typePay AND  orders.isPurchase = FALSE ',
+        {
+          shopId: id,
+          typePay: 'online',
+        },
+      )
+      .getMany();
+    return orders;
+  }
+
+  async getAllOrderOnlineOfShopPurchased(id: string) {
+    const orders = await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.product', 'product')
+      .where(
+        'product.shopId =:shopId AND orders.type_pay = :typePay AND orders.isPurchase = TRUE',
+        {
+          shopId: id,
+          typePay: 'online',
+        },
+      )
+      .getMany();
+    return orders;
+  }
+
+  async getAllOrderOfflineShop(id: string) {
+    const orders = await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.product', 'product')
+      .where(
+        'product.shopId =:shopId AND orders.type_pay = :typePay AND orders.isPurchase = FALSE',
+        {
+          shopId: id,
+          typePay: 'offline',
+        },
+      )
+      .getMany();
+    return orders;
+  }
+
+  async getAllOrderOfflineShopPurchased(id: string) {
+    const orders = await this.orderRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.product', 'product')
+      .where('product.shopId =:shopId AND orders.type_pay = :typePay', {
+        shopId: id,
+        typePay: 'offline',
+      })
+      .getMany();
+    return orders;
+  }
+
+  async setMoneyUserBuy(userId: string, price: number) {
+    const wallet = await this.walletService.getWalletByUser(userId);
+    if (wallet.consumer_wallet >= price) {
+      wallet.consumer_wallet = wallet.consumer_wallet - price;
+      await this.walletRepository.save(wallet);
+      return true;
+    } else {
+      return false;
     }
   }
 }

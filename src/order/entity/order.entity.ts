@@ -35,6 +35,9 @@ export class OrderEntity extends BaseEntity {
   @Column('uuid')
   userId: string;
 
+  @Column('boolean', { default: false })
+  isPurchase: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: 'CASCADE' })
   user: UserEntity;
 }

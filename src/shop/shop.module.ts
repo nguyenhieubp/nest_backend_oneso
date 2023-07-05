@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { ShopController } from './shop.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,18 +8,24 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from 'dotenv';
 import { OTPEntity } from '../otp/otp.entity';
 import { OtpModule } from 'src/otp/otp.module';
+import { ProductEntity } from 'src/product/entity/product.entity';
+import { OrderService } from 'src/order/order.service';
+import { OrderModule } from 'src/order/order.module';
+import { ProductModule } from 'src/product/product.module';
 dotenv.config();
 
 @Module({
   imports: [
     OtpModule,
-    TypeOrmModule.forFeature([ShopEntity, OTPEntity]),
+    OrderModule,
+    ProductModule,
+    TypeOrmModule.forFeature([ShopEntity, OTPEntity, ProductEntity]),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.gmail.com',
+        host: process.env.HOST_EMAIL,
         secure: false,
         auth: {
-          user: 'nguyenhieu11ka@gmail.com',
+          user: process.env.EMAIL,
           pass: process.env.PASSWORD_MAIL,
         },
       },

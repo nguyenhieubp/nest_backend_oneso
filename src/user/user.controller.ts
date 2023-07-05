@@ -11,18 +11,20 @@ import {
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity/user.entity';
 import { JwtGuard } from './guard/jwt.guard';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger/dist';
 
 @Controller('user')
+@ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Patch('register/admin')
-  @UseGuards(JwtGuard)
-  registerAdmin(@Req() req): Promise<UserEntity> {
-    return this.userService.registerAdmin(req.user.id);
-  }
-
   @Get('findUser')
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtGuard)
   findUser(@Req() req): Promise<UserEntity> {
     return this.userService.findUser(req.user.id);
@@ -34,6 +36,18 @@ export class UserController {
   }
 
   @Patch('update/phoneNumber')
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        phoneNumber: {
+          type: 'string',
+          description: 'Phone Number',
+        },
+      },
+    },
+  })
   @UseGuards(JwtGuard)
   updatePhoneNumber(
     @Req() req,
@@ -43,6 +57,18 @@ export class UserController {
   }
 
   @Patch('referralCode')
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        referralCode: {
+          type: 'string',
+          description: 'referralCode',
+        },
+      },
+    },
+  })
   @UseGuards(JwtGuard)
   referralCode(
     @Req() req,
@@ -52,6 +78,18 @@ export class UserController {
   }
 
   @Patch('update/avatar')
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          description: 'avatar',
+        },
+      },
+    },
+  })
   @UseGuards(JwtGuard)
   updateAvatar(
     @Req() req,
@@ -61,6 +99,18 @@ export class UserController {
   }
 
   @Put('update')
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'any',
+          description: 'user',
+        },
+      },
+    },
+  })
   @UseGuards(JwtGuard)
   async updateUser(
     @Req() req,
@@ -71,6 +121,18 @@ export class UserController {
 
   @Patch('address')
   @UseGuards(JwtGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        address: {
+          type: 'string',
+          description: 'address',
+        },
+      },
+    },
+  })
   updateAddress(
     @Req() req,
     @Body('address') address: string,

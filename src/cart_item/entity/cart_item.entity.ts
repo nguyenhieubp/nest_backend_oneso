@@ -1,9 +1,11 @@
+import { ApiTags } from '@nestjs/swagger';
 import { CartEntity } from 'src/cart/entity/cart.entity';
 import { BaseEntity } from 'src/config/baseEntity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity({ name: 'cart_item' })
+@ApiTags('Cart-Item')
 export class CartItemEntity extends BaseEntity {
   @Column('uuid')
   productId: ProductEntity;

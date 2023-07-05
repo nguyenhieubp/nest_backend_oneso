@@ -1,9 +1,11 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Post, Get, Param, Patch } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { WalletDto } from './dto/wallet.dto';
 import { WalletEntity } from './entity/wallet.entity';
 
 @Controller('wallet')
+@ApiTags('Wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 

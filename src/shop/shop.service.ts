@@ -8,6 +8,7 @@ import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import { ProductService } from 'src/product/product.service';
 dotenv.config();
 
 @Injectable()
@@ -17,6 +18,7 @@ export class ShopService {
     private readonly shopRepository: Repository<ShopEntity>,
     private readonly mailService: MailerService,
     private readonly jwtService: JwtService,
+    private readonly productService: ProductService,
   ) {}
 
   async registerShop(dataShop: ShopDto): Promise<ShopEntity> {
@@ -76,7 +78,7 @@ export class ShopService {
   }
 
   async verifyShop(req: Request): Promise<ShopEntity> {
-    const cookieEmail = req.cookies['access_token_shop'];
+    const cookieEmail = req.cookies.access_token_shop;
     const token = cookieEmail.replace('Bearer ', '');
     const shop = await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_SECRET,

@@ -72,7 +72,8 @@ export class UserRightService {
       price,
     );
     //POLICY FUND = 30% DISCOUNT FUND
-    const policyFund = (30 / 100) * Number(moneyDiscount);
+    const policyFund = (10 / 100) * Number(moneyDiscount);
+    await this.fundService.discountFundDown(process.env.FUND_MONEY, policyFund);
 
     //SAVE POLICY FUND
     await this.fundService.policyFundUp(process.env.FUND_MONEY, policyFund);
@@ -127,8 +128,10 @@ export class UserRightService {
       quantity,
       price,
     );
+    console.log('----');
     const policyFund = (30 / 100) * Number(moneyDiscount);
     await this.fundService.policyFundUp(process.env.FUND_MONEY, policyFund);
+    await this.fundService.discountFundDown(process.env.FUND_MONEY, policyFund);
     return policyFund;
   }
 
@@ -180,8 +183,11 @@ export class UserRightService {
       quantity,
       price,
     );
-    const policyFund = (30 / 100) * Number(moneyDiscount);
+
+    const policyFund = (50 / 100) * Number(moneyDiscount);
     await this.fundService.policyFundUp(process.env.FUND_MONEY, policyFund);
+    await this.fundService.discountFundDown(process.env.FUND_MONEY, policyFund);
+
     return policyFund;
   }
 
@@ -206,7 +212,6 @@ export class UserRightService {
         quantity *
         (Number(product.discount_direct_price) / 100);
     }
-
     //  QUỸ QUẢN TRỊ ĐƯỢC TRÍCH LẬP RA TỪ 20% QUỸ CHIẾT KHẤU
     // SAVE MANAGEMENT IN DB
     const managementFund = moneyDiscount * (20 / 100);
@@ -215,7 +220,7 @@ export class UserRightService {
       managementFund,
     );
 
-    // SAVE DISCOUNT IN DB
+    // // SAVE DISCOUNT IN DB
     await this.fundService.discountFundUp(
       process.env.FUND_MONEY,
       moneyDiscount - managementFund,
@@ -230,7 +235,6 @@ export class UserRightService {
   }
 
   //**GET MONEY DISCOUNT */
-
   async consumerWalletSharingIncome(id: string) {
     //GET USER
     const user = await this.userRepository.findOneById(id);
@@ -323,29 +327,14 @@ export class UserRightService {
     switch (user.level) {
       case 'T1':
         walletOfUser.consumer_wallet = (10 / 100) * managementFund;
-        //SAVE DECREMENT VALUE
-        await this.fundService.managerFundDown(
-          process.env.FUND_MONEY,
-          (10 / 100) * managementFund,
-        );
         await this.walletRepository.save(walletOfUser);
         break;
       case 'T2':
         walletOfUser.consumer_wallet = (20 / 100) * managementFund;
-        //SAVE DECREMENT VALUE
-        await this.fundService.managerFundDown(
-          process.env.FUND_MONEY,
-          (20 / 100) * managementFund,
-        );
         await this.walletRepository.save(walletOfUser);
         break;
       case 'T3':
         walletOfUser.consumer_wallet = (40 / 100) * managementFund;
-        //SAVE DECREMENT VALUE
-        await this.fundService.managerFundDown(
-          process.env.FUND_MONEY,
-          (40 / 100) * managementFund,
-        );
         await this.walletRepository.save(walletOfUser);
         break;
     }

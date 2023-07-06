@@ -26,7 +26,7 @@ export class WalletEntity extends BaseEntity {
   oneso_pay: number;
 
   @Column('uuid', { nullable: true })
-  userId: UserEntity;
+  userId: string;
 
   @OneToOne(() => UserEntity, { nullable: true })
   @JoinColumn()

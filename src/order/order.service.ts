@@ -59,8 +59,38 @@ export class OrderService {
     );
 
     //SET PRICE ODER
+
+    // CHECK USER USE VOUCHER FOR ORDER
+    if (vouchers.length <= 0) {
+      if (order.type_pay === 'online') {
+        //SET MONEY USER
+        const isSuccess = await this.setMoneyUserBuy(idUser, priceOrder);
+        if (isSuccess === false) {
+          return 'Not enough money';
+        }
+      }
+      await this.orderRepository.save({ ...newOrder, price: priceOrder });
+      await this.countMoneyForFriend(
+        idUser,
+        dataOrder.productId,
+        dataOrder.type_pay,
+        vouchers,
+        dataOrder.quantity,
+        priceOrder,
+      );
+      return this.generateOrderById(newOrder.id);
+    }
+
+    //**USE VOUCHER ======================== */
     const priceOrderReal =
       Number(priceOrder) - Number(priceOrder) * (Number(percentDiscount) / 100);
+    if (order.type_pay === 'online') {
+      //SET MONEY USER
+      const isSuccess = await this.setMoneyUserBuy(idUser, priceOrderReal);
+      if (isSuccess === false) {
+        return 'Not enough money';
+      }
+    }
     await this.orderRepository.save({ ...newOrder, price: priceOrderReal });
 
     /**CHECK USER REFERRAL CODE */
@@ -73,26 +103,6 @@ export class OrderService {
       priceOrderReal,
     );
 
-    if (order.type_pay === 'online') {
-      //SET MONEY USER
-      const isSuccess = await this.setMoneyUserBuy(idUser, priceOrderReal);
-      if (isSuccess === false) {
-        return 'Not enough money';
-      }
-    }
-
-    // CHECK USER USE VOUCHER FOR ORDER
-    if (vouchers.length <= 0) {
-      await this.orderRepository.save({ ...newOrder, price: priceOrder });
-      if (order.type_pay === 'online') {
-        //SET MONEY USER
-        const isSuccess = await this.setMoneyUserBuy(idUser, priceOrder);
-        if (isSuccess === false) {
-          return 'Not enough money';
-        }
-      }
-      return this.generateOrderById(newOrder.id);
-    }
     //RETURN RESULT ORDER
     return this.generateOrderById(newOrder.id);
   }

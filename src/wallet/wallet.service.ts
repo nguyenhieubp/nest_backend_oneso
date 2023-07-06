@@ -75,7 +75,7 @@ export class WalletService {
     }
     wallet.consumer_wallet += money;
     await this.walletRepository.save(wallet);
-    return await this.walletRepository.findOneById(id);
+    return await this.walletRepository.findOneBy({ userId: id });
   }
 
   async updateConsumerFundDown(
